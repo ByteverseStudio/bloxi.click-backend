@@ -1,0 +1,15 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "Bloxi API",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Everbyte, Newspicel",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.0.0-beta.1",
+    "mongoose": "^6.2.3"
+  }
+}
