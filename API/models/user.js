@@ -17,6 +17,10 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'roblox_account'
     }],
+    discord_servers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'discord_server'
+    }]
 });
 
 module.exports = mongoose.model('user', userSchema);
