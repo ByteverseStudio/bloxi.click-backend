@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const roblox_accountSchema = new mongoose.Schema({
+const robloxAccountSchema = new mongoose.Schema({
     robloxId: {
         type: Number,
         required: true,
@@ -12,6 +12,10 @@ const roblox_accountSchema = new mongoose.Schema({
         required: true,
         unique: true,
         match: /^(?=^[^_]+_?[^_]+$)\w{3,20}$/
+    },
+    group: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'roblox_group'
     },
 });
 
