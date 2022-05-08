@@ -9,5 +9,5 @@ API Design Overview:
 
 ## Style Guide
 Variables in snake_case.
-Methods in camelCase, except for Methods inside controllers in snake_case.
+Methods in camelCase, except for Methods inside controllers & middleware in snake_case.
 
