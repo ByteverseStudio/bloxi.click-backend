@@ -18,36 +18,73 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    robloxId: {
+    roblox_id: {
         type: Number,
         required: true,
         unique: true,
         default: -1
     },
-    createdAt: {
+    created_at: {
         type: Date,
         default: Date.now
     },
-    status: {
-        type: String,
-        enum: ['created','emailverified', 'robloxverified', 'active'],
-        default: 'created'
+    roblox_verified: {
+        type: Boolean,
+        default: false
     },
-    verifyToken: {
-        type: String,
-        default: null
+    email_verified: {
+        type: Boolean,
+        default: false
     },
     robloxData: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'robloxData'
+        groups: [{
+            group_id: {
+                type: String,
+                required: true,
+                unique: true
+            },
+            group_name: {
+                type: String,
+                required: true,
+                unique: true
+            },
+            group_url: {
+                type: String,
+                required: true,
+                unique: true
+            },
+            group_role: {
+                type: String,
+                required: true,
+                unique: true
+            }
+        }],
     },
-    discordData: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'discordData'
+    discord_data: {
+        discord_id: {
+            type: String,
+            required: true,
+            unique: true
+        },
+        discord_username: {
+            type: String,
+            required: true,
+            unique: true
+        },
+        discord_discriminator: {
+            type: String,
+            required: true
+        },
+        token_data: {
+            access_token: String,
+            refresh_token: String,
+            expires_in: Date,
+            token_type: String,
+            scope: String
+        }
     },
-    otherData: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'otherData'
+    other_data: {
+        
     }
 });
 
