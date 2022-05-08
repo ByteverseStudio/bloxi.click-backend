@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
-const User = require('../models/user/user');
-const RobloxData = require('../models/user/robloxData');
-const DiscordData = require('../models/user/discordData');
-const OtherData = require('../models/user/otherData');
+const User = require('../../models/user/userser');
+const RobloxData = require('../../models/user/robloxData');
+const DiscordData = require('../../models/user/discordData');
+const OtherData = require('../../models/user/otherData');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const express = require('express');
@@ -48,11 +48,10 @@ router.post('/login', (req, res) => {
                 robloxId: user.robloxId
             }, 'secret', { expiresIn: '1h' });
             res.json({ token });
-        }
-        )
-        .catch(err => res.status(400).json({ error: err }));
-}
-);
+        }).catch(err => res.status(400).json({ error: err }));
+});
+
+
 
 router.post('verify/email', (req, res) => {
     const { email, emailVerifyToken } = req.body;
