@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const noblox = require('noblox.js');
 
 console.log('Starting app...');
 
@@ -16,6 +17,15 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
     .catch(err => console.log(err));
 
 mongoose.Promise = global.Promise;
+
+// Noblox.js
+if (process.env.NOBLOX_COOKIE) {
+    noblox.setCookie(process.env.NOBLOX_COOKIE);
+    console.log(`Logged in on Roblox as ${currentUser.UserName} [${currentUser.UserID}]`)
+}else{
+    console.log('No cookie set, not logged in on Roblox');
+}
+
 
 //app.use
 
