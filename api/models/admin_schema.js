@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const adminSchema = new mongoose.Schema({
+const admin_schema = new mongoose.Schema({
     token: {
         type: String,
         required: true,
@@ -10,4 +10,4 @@ const adminSchema = new mongoose.Schema({
 }
 );
 
-export default mongoose.model('admin', adminSchema);
+export default mongoose.model('admin', admin_schema);

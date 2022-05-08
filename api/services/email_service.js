@@ -1,6 +1,6 @@
 import aws from 'aws-sdk';
 
-function send_verify_mail(email, email_verification_token){
+function sendVerifyEmail(email, email_verification_token){
     // Create sendEmail params 
     const params = {
         Destination: {
@@ -47,5 +47,5 @@ function send_verify_mail(email, email_verification_token){
 }
 
 export default {
-    send_verify_mail
+    sendVerifyEmail
 }

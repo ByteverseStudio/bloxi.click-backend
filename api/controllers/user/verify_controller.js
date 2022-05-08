@@ -15,7 +15,7 @@ const send_email = (req, res) => {
     user.save()
         .then(() => {
             res.json({ message: 'Email updated' });
-            email_service.send_verify_mail(email, user.email_verification_token)
+            email_service.sendVerifyEmail(email, user.email_verification_token)
                 .then(() => {
                     console.log('Email sent');
                     res.json({ message: 'Email sent' });

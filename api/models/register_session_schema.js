@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const registerSessionSchema = new mongoose.Schema({
+const register_session_schema = new mongoose.Schema({
     indetifier: {
         type: String,
         required: true,
@@ -24,4 +24,4 @@ const registerSessionSchema = new mongoose.Schema({
 }
 );
 
-export default mongoose.model('registerSession', registerSessionSchema);
+export default mongoose.model('register_session', register_session_schema);
