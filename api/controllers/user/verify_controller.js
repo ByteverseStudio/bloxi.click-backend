@@ -1,5 +1,6 @@
-import aws from 'aws-sdk';
 import user_schema from '../../models/user_schema.js';
+import email_service from '../../services/email_service.js';
+
 
 const send_email = (req, res) => {
 
@@ -14,54 +15,16 @@ const send_email = (req, res) => {
     user.save()
         .then(() => {
             res.json({ message: 'Email updated' });
-
-            // Create sendEmail params 
-            const params = {
-                Destination: {
-                    ToAddresses: [
-                        email
-                    ]
-                },
-                Message: {
-                    Body: {
-                        Html: {
-                            Charset: 'UTF-8',
-                            Data: `<html>
-                            <head>
-                                <title>Verify your email</title>
-                            </head>
-                            <body>
-                                <h1>Verify your email</h1>
-                                <p>
-                                    <a href="${process.env.frontendUrl}/verify/${user.email_verification_token}">Verify your email</a>
-                                </p>
-                            </body>
-                            </html>`,
-                        },
-                        Text: {
-                            Charset: 'UTF-8',
-                            Data: `Verify your email: ${process.env.frontendUrl}/verify/${user.email_verification_token}`,
-                        }
-                    },
-                    Subject: {
-                        Charset: 'UTF-8',
-                        Data: 'Verify your email',
-                    }
-                },
-                Source: process.env.emailSender,
-            };
-
-            var emailSender = new aws.SESV2().sendEmail(params, function (err, data) {
-                if (err) {
+            email_service.send_verify_mail(email, user.email_verification_token)
+                .then(() => {
+                    console.log('Email sent');
+                    res.json({ message: 'Email sent' });
+                }).catch(err => {
                     console.log(err);
                     res.status(500).json({ error: err });
-                } else {
-                    console.log(data);
-                    res.json({ message: 'Email sent' });
-                }
-            });
-        }
-        ).catch(err => res.status(400).json({ error: err }));
+                });
+        }).catch(err => res.status(400).json({ error: err }));
+    
 }
 
 const verify_email = (req, res) => {
