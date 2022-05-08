@@ -24,5 +24,6 @@ user_router.post('/verify/email', check_user_auth, verify_controller.verify_emai
 
 //User
 user_router.get('/me', check_user_auth, user_controller.me);
+user_router.put('/me/change_password', check_user_auth, user_controller.change_password);
 
 export default user_router;
