@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const registerSessionSchema = new mongoose.Schema({
     indetifier: {
@@ -24,4 +24,4 @@ const registerSessionSchema = new mongoose.Schema({
 }
 );
 
-module.exports = mongoose.model('registerSession', registerSessionSchema);
+export default mongoose.model('registerSession', registerSessionSchema);

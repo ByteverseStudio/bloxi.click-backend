@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
 
@@ -36,6 +36,10 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    email_verification_token: {
+        type: String,
+        default: null
+    },
     robloxData: {
         groups: [{
             group_id: {
@@ -61,17 +65,17 @@ const userSchema = new mongoose.Schema({
         }],
     },
     discord_data: {
-        discord_id: {
+        id: {
             type: String,
             required: true,
             unique: true
         },
-        discord_username: {
+        username: {
             type: String,
             required: true,
             unique: true
         },
-        discord_discriminator: {
+        discriminator: {
             type: String,
             required: true
         },
@@ -88,6 +92,6 @@ const userSchema = new mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('user', userSchema);
+export default mongoose.model('user', userSchema);
 
 

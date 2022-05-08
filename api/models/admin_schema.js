@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const adminSchema = new mongoose.Schema({
     token: {
@@ -10,4 +10,4 @@ const adminSchema = new mongoose.Schema({
 }
 );
 
-module.exports = mongoose.model('admin', adminSchema);
+export default mongoose.model('admin', adminSchema);

@@ -1,8 +1,6 @@
-const jsonwebtoken = require('jsonwebtoken');
-const mongoose = require('mongoose');
-const Admin = require('../models/admin');
+import admin_schema from '../models/admin_schema.js';
 
-module.exports = (req, res, next) => {
+export default (req, res, next) => {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
         return res.status(401).json({
@@ -13,7 +11,7 @@ module.exports = (req, res, next) => {
         return res.status(401).json({
             message: 'Token not found'});
     }
-    Admin.findOne({ token })
+    admin_schema.findOne({ token })
         .then(admin => {
             if (!admin) {
                 return res.status(401).json({
@@ -21,9 +19,7 @@ module.exports = (req, res, next) => {
             }
             req.admin = admin;
             next();
-        }
-        )
-        .catch(err => res.status(401).json({
+        }).catch(err => res.status(401).json({
             message: 'Token is invalid'}));
 }
 
