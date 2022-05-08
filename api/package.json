@@ -4,12 +4,13 @@
   "description": "Bloxi API",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node app.js"
   },
   "author": "Everbyte, Newspicel",
   "license": "MIT",
   "dependencies": {
     "express": "^5.0.0-beta.1",
-    "mongoose": "^6.2.3"
+    "mongoose": "^6.2.3",
+    "noblox.js": "^4.13.1"
   }
 }
