@@ -8,7 +8,7 @@ function createJWTLogin(user) {
         username: user.username,
         _id: user._id,
         roblox_id: user.roblox_id
-    }, process.env.jwtSecret, { expiresIn: '1w' });
+    }, process.env.JWT_SECRET, { expiresIn: '1w' });
 }
 
 function createAccount(indetifier, email, password, other_data, email_verified, roblox_verified) {
@@ -16,12 +16,13 @@ function createAccount(indetifier, email, password, other_data, email_verified, 
     register_session_schema.findOne({ indetifier })
         .then(session => {
             if (!session) {
-                return res.status(404).json({ error: 'Session not found' });
+                return Promise.reject({ message: 'Invalid register session', status: 400 });
             }
             //Session older than 24 hours
             if (session.created_at < Date.now() - 86400000) {
-                session.deleteOne()
-                return res.status(404).json({ error: 'Session expired' });
+                session.deleteOne().then(() => {
+                    return Promise.reject({ message: 'Register session expired', status: 400 });
+                });
             }
             const newUser = new User({
                 email: email,
@@ -36,14 +37,10 @@ function createAccount(indetifier, email, password, other_data, email_verified, 
             });
             newUser.save()
                 .then(() => {
-                    session.deleteOne()
-                    return res.json({ message: 'User created successfully' });
-                }
-                )
-                .catch(err => res.status(400).json({ error: err }));
-        }
-        )
-        .catch(err => res.status(400).json({ error: err }));
+                    session.deleteOne().then(() => { return Promise.resolve(newUser) })
+                        .catch(err => { return Promise.reject({ message: 'Failed to create account', status: 500, error: err }) });
+                }).catch(err => { Promise.reject({ message: 'Failed to create account', status: 500, error: err }) });
+        }).catch(err => { Promise.reject({ message: 'Failed to create account', status: 400, error: err }) });
 }
 
 export default {

@@ -2,7 +2,7 @@ import user_schema from '../../models/user_schema.js';
 import email_service from '../../services/email_service.js';
 
 
-const send_email = (req, res) => {
+const send_email = (req, res, next) => {
 
     const user = req.user;
 
@@ -19,15 +19,11 @@ const send_email = (req, res) => {
                 .then(() => {
                     console.log('Email sent');
                     res.json({ message: 'Email sent' });
-                }).catch(err => {
-                    console.log(err);
-                    res.status(500).json({ error: err });
-                });
-        }).catch(err => res.status(400).json({ error: err }));
-    
+                }).catch(err => next(err));
+        }).catch(err => next(err));
 }
 
-const verify_email = (req, res) => {
+const verify_email = (req, res, next) => {
     const { email, email_verification_token } = req.body;
 
     user_schema.findOne({ email })
@@ -36,7 +32,8 @@ const verify_email = (req, res) => {
                 return res.status(404).json({ error: 'User not found' });
             }
             if (user.email_verified) {
-                return res.status(400).json({ error: 'Email already verified' });
+                const err = {message: 'Email already verified', status: 400};
+                next(err);
             }
             if (user.email_verification_token !== email_verification_token) {
                 return res.status(400).json({ error: 'Invalid token' });

@@ -7,12 +7,11 @@ const register_session_schema = new mongoose.Schema({
         unique: true
     },
     roblox_id: {
-        type: Number,
+        type: String,
         required: true,
         unique: true,
-        default: -1
     },
-    roblox_name: {
+    roblox_username: {
         type: String,
         required: true,
         unique: true

@@ -2,11 +2,11 @@ import axios from 'axios';
 
 const getToken = discord_code => {
     axios.post('https://discordapp.com/api/oauth2/token', {
-        client_id: process.env.discordClientID,
-        client_secret: process.env.discordClientSecret,
+        client_id: process.env.DISCORD_CLIENT_ID,
+        client_secret: process.env.DISCORD_CLIENT_SECRET,
         grant_type: 'authorization_code',
         code: discord_code,
-        redirect_uri: process.env.discordRedirectUri
+        redirect_uri: process.env.DISCORD_REDIRECT_URI
     }).then(response => {
         const token = response.data.access_token;
 

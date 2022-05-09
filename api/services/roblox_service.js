@@ -11,10 +11,8 @@ const checkTokenInBlurb = (roblox_user_id, token) =>{
             }
         }).catch(err => {
             reject(err);
-        }
-        );
-    }
-    );
+        });
+    });
 }
 
 export default {

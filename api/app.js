@@ -10,7 +10,7 @@ const app = express();
 
 app.use(json());
 
-const db_uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/roblox-discord-sync';
+const db_uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/bloxi';
 
 console.log('Connecting to mongodb...');
 
@@ -35,8 +35,15 @@ aws.config.update({
     region: process.env.AWS_REGION
 });
 
+app.use(function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', process.env.FRONTEND_URL);
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+
+    next();
+});
+
 app.get('/', (req, res) => {
-    res.send('Hello World!');
+    res.json({ message: 'API is running' });
 });
 
 app.use('/user', user_router);
@@ -44,16 +51,15 @@ app.use('/user', user_router);
 //catch 404 and forward to error handler
 app.use(function (req, res, next) {
     res.status(404).json({ error: 'Not found' });
-}
-);
+});
 
 //error handler
 app.use(function (err, req, res, next) {
-    // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
-    // render the error page
-    res.status(err.status || 500).json({ error: err });
-}
-);
+    console.log(err);
+    res.status(err.status || 500).json({ error: err.err || {}, status: 'error', message: err.message || 'Something went wrong' });
+});
+
+app.listen(process.env.PORT || 3000, () => {
+    console.log('Server started...');
+});
 

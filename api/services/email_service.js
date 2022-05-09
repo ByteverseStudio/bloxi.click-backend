@@ -1,6 +1,8 @@
 import aws from 'aws-sdk';
 
-function sendVerifyEmail(email, email_verification_token){
+const SESV2 = new aws.SESV2();
+
+function sendVerifyEmail(email, email_verification_token) {
     // Create sendEmail params 
     const params = {
         Destination: {
@@ -19,14 +21,14 @@ function sendVerifyEmail(email, email_verification_token){
                     <body>
                         <h1>Verify your email</h1>
                         <p>
-                            <a href="${process.env.frontendUrl}/verify/${user.email_verification_token}">Verify your email</a>
+                            <a href="${process.env.FRONTEND_URL}/verify/${user.email_verification_token}">Verify your email</a>
                         </p>
                     </body>
                     </html>`,
                 },
                 Text: {
                     Charset: 'UTF-8',
-                    Data: `Verify your email: ${process.env.frontendUrl}/verify/${user.email_verification_token}`,
+                    Data: `Verify your email: ${process.env.FRONTEND_URL}/verify/${user.email_verification_token}`,
                 }
             },
             Subject: {
@@ -37,13 +39,16 @@ function sendVerifyEmail(email, email_verification_token){
         Source: process.env.emailSender,
     };
 
-    var emailSender = new aws.SESV2().sendEmail(params, function (err, data) {
-        if (err) {
-            Promise.reject(err);
-        } else {
-            Promise.resolve(data);
-        }});
-    Promise.resolve(null);
+    return new Promise((resolve, reject) => {
+        SESV2.sendEmail(params, (err, data) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(data);
+            }
+        });
+    });
+
 }
 
 export default {
