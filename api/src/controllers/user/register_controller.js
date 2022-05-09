@@ -73,13 +73,13 @@ const create_account_discord = (req, res, next) => {
     discord_service.getToken(discordCode).then(token => {
         discord_service.getUserInfo(token).then(user => {
             const discordData = {
-                id: response.data.id,
-                username: response.data.username,
-                discriminator: response.data.discriminator,
-                tokenData: discordTokenData
+                id: user.id,
+                username: user.username,
+                discriminator: user.discriminator,
+                tokenData: token
             }
 
-            const email = response.data.email;
+            const email = user.email;
 
             user_service.createAccount(indetifier, email, password, { discordData, otherData: null }, true, false)
                 .then(() => { res.json({ message: 'Account created' })})
