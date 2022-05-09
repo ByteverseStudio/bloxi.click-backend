@@ -40,6 +40,10 @@ const user_schema = new mongoose.Schema({
         type: String,
         default: null
     },
+    roblox_verification_token: {
+        type: String,
+        default: null
+    },
     robloxData: {
         groups: [{
             group_id: {
