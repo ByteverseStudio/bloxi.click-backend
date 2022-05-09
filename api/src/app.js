@@ -1,14 +1,15 @@
-import express, { json } from 'express';
+import 'dotenv/config'
+import express from 'express';
 import mongoose from 'mongoose';
-import nobloxJs from 'noblox.js';
 import aws from 'aws-sdk';
 import user_router from './routes/user_router.js';
+import error_handler, { error } from './utils/error_handler.js';
 
 console.log('Starting app...');
 
 const app = express();
 
-app.use(json());
+app.use(express.json());
 
 const db_uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/bloxi';
 
@@ -19,14 +20,6 @@ mongoose.connect(db_uri, { useNewUrlParser: true, useUnifiedTopology: true })
     .catch(err => console.log(err));
 
 mongoose.Promise = global.Promise;
-
-// Noblox.js
-if (process.env.NOBLOX_COOKIE) {
-    nobloxJs.setCookie(process.env.NOBLOX_COOKIE);
-    console.log(`Logged in on Roblox as ${currentUser.UserName} [${currentUser.UserID}]`)
-}else{
-    console.log('No cookie set, not logged in on Roblox');
-}
 
 // AWS
 aws.config.update({
@@ -48,16 +41,9 @@ app.get('/', (req, res) => {
 
 app.use('/user', user_router);
 
-//catch 404 and forward to error handler
-app.use(function (req, res, next) {
-    res.status(404).json({ error: 'Not found' });
-});
-
-//error handler
-app.use(function (err, req, res, next) {
-    console.log(err);
-    res.status(err.status || 500).json({ error: err.err || {}, status: 'error', message: err.message || 'Something went wrong' });
-});
+app.use(error_handler.notFoundHandler);
+app.use(error_handler.errorLogger);
+app.use(error_handler.errorHandler);
 
 app.listen(process.env.PORT || 3000, () => {
     console.log('Server started...');

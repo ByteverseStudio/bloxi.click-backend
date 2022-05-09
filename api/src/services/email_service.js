@@ -1,6 +1,6 @@
 import aws from 'aws-sdk';
 
-const SESV2 = new aws.SESV2();
+const SESV2 = new aws.SES();
 
 function sendVerifyEmail(email, email_verification_token) {
     // Create sendEmail params 
@@ -15,20 +15,20 @@ function sendVerifyEmail(email, email_verification_token) {
                 Html: {
                     Charset: 'UTF-8',
                     Data: `<html>
-                    <head>
-                        <title>Verify your email</title>
-                    </head>
-                    <body>
-                        <h1>Verify your email</h1>
-                        <p>
-                            <a href="${process.env.FRONTEND_URL}/verify/${user.email_verification_token}">Verify your email</a>
-                        </p>
-                    </body>
-                    </html>`,
+                        <head>
+                            <title>Verify your email</title>
+                        </head>
+                        <body>
+                            <h1>Verify your email</h1>
+                            <p>
+                                <a href="${process.env.FRONTEND_URL}/verify/${email_verification_token}">Verify your email</a>
+                            </p>
+                        </body>
+                        </html>`,
                 },
                 Text: {
                     Charset: 'UTF-8',
-                    Data: `Verify your email: ${process.env.FRONTEND_URL}/verify/${user.email_verification_token}`,
+                    Data: `Verify your email: ${process.env.FRONTEND_URL}/verify/${email_verification_token}`,
                 }
             },
             Subject: {
@@ -36,7 +36,8 @@ function sendVerifyEmail(email, email_verification_token) {
                 Data: 'Verify your email',
             }
         },
-        Source: process.env.emailSender,
+        Source: process.env.EMAIL_SENDER,
+        ReplyToAddresses: ["support@bloxi.click"]
     };
 
     return new Promise((resolve, reject) => {
@@ -48,7 +49,6 @@ function sendVerifyEmail(email, email_verification_token) {
             }
         });
     });
-
 }
 
 export default {

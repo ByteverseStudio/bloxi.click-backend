@@ -1,49 +1,51 @@
 import user_schema from '../../models/user_schema.js';
+
 import email_service from '../../services/email_service.js';
+
+import { error } from '../../utils/error_handler.js';
+
 
 
 const send_email = (req, res, next) => {
 
     const user = req.user;
 
-    const { email } = req.body || user.email;
+    const { email } = req.body || user;
 
     user.email = email;
     user.email_verified = false;
-    user.email_verification_token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const email_verification_token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    user.email_verification_token = email_verification_token;
 
     user.save()
         .then(() => {
-            res.json({ message: 'Email updated' });
-            email_service.sendVerifyEmail(email, user.email_verification_token)
+            email_service.sendVerifyEmail(email, email_verification_token)
                 .then(() => {
-                    console.log('Email sent');
                     res.json({ message: 'Email sent' });
-                }).catch(err => next(err));
-        }).catch(err => next(err));
+                }).catch(err => next(error("Email sent failed", 500, err )));
+        }).catch(err => next(error("User saved failed", 500, err )));
 }
 
 const verify_email = (req, res, next) => {
-    const { email, email_verification_token } = req.body;
+    const { email_verification_token } = req.body;
 
-    user_schema.findOne({ email })
+    user_schema.findOne({ email_verification_token })
         .then(user => {
             if (!user) {
-                return res.status(404).json({ error: 'User not found' });
+                return next(error('User not found', 404));
             }
             if (user.email_verified) {
-                const err = {message: 'Email already verified', status: 400};
-                next(err);
+                return next(error('Email already verified', 400));
             }
             if (user.email_verification_token !== email_verification_token) {
-                return res.status(400).json({ error: 'Invalid token' });
+                return next(error('Email verification token does not match', 400));
             }
             user.email_verified = true;
             user.email_verification_token = null;
             user.save()
                 .then(() => res.json({ message: 'Email verified' }))
-                .catch(err => res.status(400).json({ error: err }));
-        }).catch(err => res.status(400).json({ error: err }));
+                .catch(err => next(error("User saved failed", 500, err )));
+        }).catch(err => next(error("Error while finding user", 500, err )));
 }
 
 export default {

@@ -19,10 +19,9 @@ const user_schema = new mongoose.Schema({
         required: true
     },
     roblox_id: {
-        type: Number,
+        type: String,
         required: true,
         unique: true,
-        default: -1
     },
     created_at: {
         type: Date,
@@ -69,20 +68,9 @@ const user_schema = new mongoose.Schema({
         }],
     },
     discord_data: {
-        id: {
-            type: String,
-            required: true,
-            unique: true
-        },
-        username: {
-            type: String,
-            required: true,
-            unique: true
-        },
-        discriminator: {
-            type: String,
-            required: true
-        },
+        id: String,
+        username: String,
+        discriminator: String,
         token_data: {
             access_token: String,
             refresh_token: String,

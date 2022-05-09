@@ -1,4 +1,4 @@
-import * as jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import nobloxJs from 'noblox.js';
 import user_service from '../../services/user_serivce.js';
 import discord_service from '../../services/discord_service.js';
@@ -17,33 +17,35 @@ const start_account_creation = (req, res, next) => {
                         if (!user.roblox_verified) {
                             user.deleteOne()
                         } else {
-                            next({ message: 'User already exists', status: 400})
+                            return next({ message: 'User already exists', status: 400 })
                         }
                     }
 
-                    register_session_schema.findOne({ roblox_id: id }).deleteOne().exec();
-
-                    const indetifier = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
-
-
-                    const newRegisterSession = new register_session_schema({
-                        roblox_username: roblox_username,
-                        roblox_id: id,
-                        indetifier: indetifier,
-                        createdAt: Date.now
-                    });
-
-                    newRegisterSession.save()
+                    register_session_schema.findOne({ roblox_id: id }).deleteOne()
                         .then(() => {
-                            jwt.sign({
+
+                            const indetifier = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+
+                            const newRegisterSession = new register_session_schema({
                                 roblox_username: roblox_username,
                                 roblox_id: id,
-                                indetifier: indetifier
-                            }, process.env.JWT_SECRET, { expiresIn: '24h' })
-                                .then(token => {
-                                    console.log("Token: " + token);
-                                    res.json({ jwt: token });
-                                }).catch(err => next({ error: err, status: 500, message: 'Failed to create jwt token' }));
+                                indetifier: indetifier,
+                                createdAt: Date.now
+                            });
+
+                            newRegisterSession.save()
+                                .then(() => {
+                                    jwt.sign({
+                                        roblox_username: roblox_username,
+                                        roblox_id: id,
+                                        indetifier: indetifier
+                                    }, process.env.JWT_SECRET, { expiresIn: '24h' }, (err, token) => {
+                                        if (err) {
+                                            return next({ message: 'Failed to create jwt token', status: 500, error: err });
+                                        }
+                                        res.json({ jwt: token });
+                                    });
+                                }).catch(err => next({ message: 'Failed to create register session', status: 500, error: err }));
                         }).catch(err => next({ message: 'Failed to create register session', status: 500, error: err }));
                 }).catch(err => next({ message: 'Failed to create register session', status: 400, error: err }));
         }).catch(err => next({ message: 'Failed to create register session', status: 400, error: err }));
@@ -53,22 +55,19 @@ const create_account = (req, res, next) => {
     const { indetifier, email, password } = req.body;
 
     if (!indetifier || !email || !password) {
-        next({ message: 'Missing required fields', status: 400 });
-        return;
+        return next({ message: 'Missing required fields', status: 400 });
     }
 
     user_service.createAccount(indetifier, email, password, { discordData: null, otherData: null }, false, false)
-        .then(() => {
-            res.json({ message: 'Account created' });
-        }).catch(err => next({ message: 'Failed to create account', status: 500, error: err }));
+        .then((user) => { res.json({ message: 'Account created' })})
+        .catch(err => next({ message: 'Failed to create account', status: 500, error: err }));
 }
 
 const create_account_discord = (req, res, next) => {
     const { indetifier, password, discordCode } = req.body;
 
     if (!indetifier || !password || !discordCode) {
-        next({ message: 'Missing required fields', status: 400 });
-        return;
+        return next({ message: 'Missing required fields', status: 400 });
     }
 
     discord_service.getToken(discordCode).then(token => {
@@ -83,9 +82,8 @@ const create_account_discord = (req, res, next) => {
             const email = response.data.email;
 
             user_service.createAccount(indetifier, email, password, { discordData, otherData: null }, true, false)
-                .then(() => {
-                    res.json({ message: 'Account created' });
-                }).catch(err => next({ message: 'Failed to create account', status: 500, error: err }));
+                .then(() => { res.json({ message: 'Account created' })})
+                .catch(err => next({ message: 'Failed to create account', status: 500, error: err }));
         }).catch(err => next({ message: 'Failed to create account', status: 500, error: err }));
     }).catch(err => next({ message: 'Failed to create account', status: 500, error: err }));
 }

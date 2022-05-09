@@ -4,25 +4,31 @@ import user_schema from '../../models/user_schema.js';
 import discord from '../../services/discord_service.js';
 import user_serivce from '../../services/user_serivce.js';
 
+import { error } from '../../utils/error.js';
 
-const login = (req, res) => {
-    const { email, password } = req.body;
 
-    user_schema.findOne({ email })
+const login = (req, res, next) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return next({ message: 'Username or password not found', status: 400 });
+    }
+
+    user_schema.findOne({$or: [{ 'username': username }, { 'email': username }]})
         .then(user => {
             if (!user) {
-                return res.status(404).json({ error: 'User not found' });
+                return next(error('User not found', 404));
             }
             const isPasswordValid = bcryptjs.compareSync(password, user.password);
             if (!isPasswordValid) {
-                return res.status(401).json({ error: 'Invalid password' });
+                return next(error("Invalid password", 400));
             }
             const token = user_serivce.createJWTLogin(user);
             res.json({ token });
-        }).catch(err => res.status(400).json({ error: err }));
+        }).catch(err => next(error("User not found", 500, err )));
 }
 
-const login_discord = (req, res) => {
+const login_discord = (req, res, next) => {
     const { discord_code } = req.body;
 
     discord.getToken(discord_code).then(discordTokenData => {
@@ -32,7 +38,7 @@ const login_discord = (req, res) => {
             findOne({ email })
                 .then(user => {
                     if (!user) {
-                        return res.status(404).json({ error: 'User not found' });
+                        return next({ message: 'User not found', status: 404 });
                     }
                     user.discordData = {
                         id: discordUserData.id,
@@ -44,10 +50,10 @@ const login_discord = (req, res) => {
                         .then(() => {
                             const token = user_serivce.createJWTLogin(user);
                             res.json({ jwt: token });
-                        }).catch(err => res.status(400).json({ error: err }));
-                }).catch(err => res.status(400).json({ error: err }));
-        }).catch(err => res.status(400).json({ error: err }));
-    }).catch(err => res.status(400).json({ error: err }));
+                        }).catch(err => next({ message: 'User saved failed', status: 500, error: err }));
+                }).catch(err => next({ message: 'User not found', status: 404, error: err }));
+        }).catch(err => next({ message: 'Failed to login', status: 500, error: err }));
+    }).catch(err => next({ message: 'Failed to login', status: 500, error: err }));
 }
 
 export default {

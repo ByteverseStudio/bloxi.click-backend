@@ -34,7 +34,8 @@ const getUserInfo = discordTokenData => {
             id: response.data.id,
             username: response.data.username,
             discriminator: response.data.discriminator,
-            token_data: discordTokenData
+            token_data: discordTokenData,
+            email: response.data.email
         }
         return Promise.resolve(discord_data);
     }).catch(err => {

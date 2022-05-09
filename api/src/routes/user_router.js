@@ -23,7 +23,7 @@ user_router.post('/register/create/discord', register_controller.create_account_
 
 //Verify
 user_router.put('/verify/email', check_user_auth, email_verify_controller.send_email);
-user_router.post('/verify/email', check_user_auth, email_verify_controller.verify_email);
+user_router.post('/verify/email', email_verify_controller.verify_email);
 
 user_router.put('/verify/roblox', check_user_auth, roblox_verify_controller.generate_roblox_verify_token);
 user_router.post('/verify/roblox', check_user_auth, roblox_verify_controller.check_roblox_verify_token);
