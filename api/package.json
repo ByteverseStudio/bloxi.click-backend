@@ -2,10 +2,12 @@
   "name": "api",
   "version": "1.0.0",
   "description": "Bloxi API",
-  "main": "app.js",
+  "main": "src/app.js",
   "type": "module",
   "scripts": {
-    "test": "node app.js"
+    "run": "node ./src/app.js",
+    "dev": "nodemon ./src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Everbyte, Newspicel",
   "license": "MIT",
