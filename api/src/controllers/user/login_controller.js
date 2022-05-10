@@ -1,31 +1,27 @@
 import bcryptjs from 'bcryptjs';
 import user_schema from '../../models/user_schema.js';
-
 import discord from '../../services/discord_service.js';
 import user_serivce from '../../services/user_serivce.js';
-
-import { error } from '../../utils/error.js';
-
 
 const login = (req, res, next) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
-        return next({ message: 'Username or password not found', status: 400 });
+        return res.status(400).json({ error: 'Username and password are required' });
     }
 
     user_schema.findOne({$or: [{ 'username': username }, { 'email': username }]})
         .then(user => {
             if (!user) {
-                return next(error('User not found', 404));
+                return res.status(404).json({ error: 'User not found' });
             }
             const isPasswordValid = bcryptjs.compareSync(password, user.password);
             if (!isPasswordValid) {
-                return next(error("Invalid password", 400));
+                return res.status(400).json({ error: 'Invalid password' });
             }
             const token = user_serivce.createJWTLogin(user);
             res.json({ token });
-        }).catch(err => next(error("User not found", 500, err )));
+        }).catch(next);
 }
 
 const login_discord = (req, res, next) => {
@@ -38,7 +34,7 @@ const login_discord = (req, res, next) => {
             findOne({ email })
                 .then(user => {
                     if (!user) {
-                        return next({ message: 'User not found', status: 404 });
+                        return res.status(404).json({ error: 'User not found' });
                     }
                     user.discordData = {
                         id: discordUserData.id,
@@ -50,10 +46,10 @@ const login_discord = (req, res, next) => {
                         .then(() => {
                             const token = user_serivce.createJWTLogin(user);
                             res.json({ jwt: token });
-                        }).catch(err => next({ message: 'User saved failed', status: 500, error: err }));
-                }).catch(err => next({ message: 'User not found', status: 404, error: err }));
-        }).catch(err => next({ message: 'Failed to login', status: 500, error: err }));
-    }).catch(err => next({ message: 'Failed to login', status: 500, error: err }));
+                        }).catch(next);
+                }).catch(next);
+        }).catch(next);
+    }).catch(next);
 }
 
 export default {

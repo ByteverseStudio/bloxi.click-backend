@@ -22,14 +22,14 @@ function createAccount(indetifier, email, password, other_data, email_verified, 
         register_session_schema.findOne({ indetifier: indetifier })
             .then(session => {
                 if (!session) {
-                    return reject({ message: 'Invalid register session', status: 400 });
+                    return reject('Session not found');
                 }
                 //Session older than 24 hours
                 if (session.created_at < Date.now() - 86400000) {
                     session.deleteOne()
                         .then(() => {
-                            return reject({ message: 'Register session expired', status: 400 });
-                        }).catch(err => { return reject({ message: 'Failed to delete register session', status: 500, error: err }) });
+                            return reject('Session expired');
+                        }).catch(err => { reject(err) });
                 }
                 const newUser = new User({
                     email: email,
@@ -45,9 +45,9 @@ function createAccount(indetifier, email, password, other_data, email_verified, 
                     .then(() => {
                         session.deleteOne()
                             .then(() => { return resolve(newUser) })
-                            .catch(err => { return reject({ message: 'Failed to create account', status: 500, error: err }) });
-                    }).catch(err => { reject({ message: 'Failed to create account', status: 500, error: err }) });
-            }).catch(err => { reject({ message: 'Failed to create account', status: 400, error: err }) });
+                            .catch(err => { reject(err) });
+                    }).catch(err => { reject(err) });
+            }).catch(err => { reject(err) });
     });
 }
 

@@ -1,8 +1,6 @@
 import user_schema from '../../models/user_schema.js';
 import random_words from 'random-words';
 import roblox_service from '../../services/roblox_service.js';
-import { error } from './utils/error_handler.js';
-
 
 const generate_roblox_verify_token = (req, res, next) => {
     const user = req.user;
@@ -11,6 +9,13 @@ const generate_roblox_verify_token = (req, res, next) => {
 
     user_schema.findOne({ _id: user._id })
         .then(user => {
+            if (!user) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+            if (user.roblox_verified) {
+                return res.status(400).json({ error: 'User already verified' });
+            }
+
             switch (token_type) {
                 case 'words':
                     user.roblox_verification_token = random_words({ exactly: 3, join: ' ' });
@@ -22,28 +27,33 @@ const generate_roblox_verify_token = (req, res, next) => {
             }
             user.save()
                 .then(() => res.json({ token: user.roblox_verification_token }))
-                .catch(err => next(error("User saved failed", 500, err )));
-        }).catch(err => next(error("Error while finding user", 500, err )));
+                .catch(next);
+        }).catch(next);
 }
 
 const check_roblox_verify_token = (req, res, next) => {
     const user = req.user;
     const token = user.roblox_verification_token;
 
-    //const { search_type } = req.body;
+    const { search_type } = req.body || "blurb";
 
-    roblox_service.checkTokenInBlurb(user.roblox_id, token)
-        .then(result => {
-            if (!result) {
-                return next(error('Roblox verification token does not match', 400));
-            }
+    switch (search_type) {
+        default:
+        case 'blurb':
+            roblox_service.checkTokenInBlurb(user.roblox_id, token)
+                .then(result => {
+                    if (!result) {
+                        return res.status(400).json({ error: 'Invalid token' });
+                    }
 
-                user.roblox_verified = true;
-                user.roblox_verification_token = null;
-                user.save()
-                    .then(() => res.status(204).json())
-                    .catch(err => next(error("User saved failed", 500, err )));
-        }).catch(err => next(error("Error while finding user", 500, err )));
+                        user.roblox_verified = true;
+                        user.roblox_verification_token = null;
+                        user.save()
+                            .then(() => res.sendStatus(204))
+                            .catch(next);
+                }).catch(next);
+            break;
+    }
 }
 
 const set_roblox_verify_status = (req, res, next) => {
@@ -52,13 +62,13 @@ const set_roblox_verify_status = (req, res, next) => {
     user_schema.findOne({ roblox_id })
         .then(user => {
             if (!user) {
-                return next(error('User not found', 404));
+                return res.status(404).json({ error: 'User not found' });
             }
             user.roblox_verified = roblox_verified;
             user.save()
                 .then(() => res.status(204).json())
-                .catch(err => next(error("User saved failed", 500, err )));
-        }).catch(err => next(error("Error while finding user", 500, err )));
+                .catch(next);
+        }).catch(next);
 }
 
 const get_user_roblox_info = (req, res) => {
@@ -67,10 +77,10 @@ const get_user_roblox_info = (req, res) => {
     user_schema.findOne({ roblox_id })
         .then(user => {
             if (!user) {
-                return next(error('User not found', 404));
+                return res.status(404).json({ error: 'User not found' });
             }
             res.json({ email: user.email, roblox_verified: user.roblox_verified, username: user.username });
-        }).catch(err => next(error("Error while finding user", 500, err )));
+        }).catch(next);
 }
 
 export default {
