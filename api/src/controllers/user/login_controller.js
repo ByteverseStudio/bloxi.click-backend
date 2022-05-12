@@ -28,28 +28,29 @@ const login_discord = (req, res, next) => {
     const { discord_code } = req.body;
 
     discord.getToken(discord_code).then(discordTokenData => {
-        discord.getUserInfo(discordTokenData).then(discordUserData => {
+        return discord.getUserInfo(discordTokenData);
+    })
+    .then(discordUserData => {
             const email = discordUserData.email;
         
-            findOne({ email })
-                .then(user => {
-                    if (!user) {
-                        return res.status(404).json({ error: 'User not found' });
-                    }
-                    user.discordData = {
-                        id: discordUserData.id,
-                        username: discordUserData.username,
-                        discriminator: discordUserData.discriminator,
-                        tokenData: discordTokenData
-                    }
-                    user.save()
-                        .then(() => {
-                            const token = user_serivce.createJWTLogin(user);
-                            res.json({ jwt: token });
-                        }).catch(next);
+            return user_schema.findOne({ email })
+    }).then(user => {
+            if (!user) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+            user.discordData = {
+                id: discordUserData.id,
+                username: discordUserData.username,
+                discriminator: discordUserData.discriminator,
+                tokenData: discordTokenData
+            }
+            user.save()
+                .then(() => {
+                    const token = user_serivce.createJWTLogin(user);
+                    res.json({ jwt: token });
                 }).catch(next);
-        }).catch(next);
-    }).catch(next);
+    })
+    .catch(next);
 }
 
 export default {

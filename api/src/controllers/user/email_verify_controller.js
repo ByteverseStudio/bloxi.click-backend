@@ -19,10 +19,10 @@ const send_email = (req, res, next) => {
                 return res.status(400).json({ error: 'Email already verified' });
             }
 
-            email_service.sendVerifyEmail(email, email_verification_token)
-                .then(() => { res.sendStatus(204) })
-                .catch(next);
-        }).catch(next);
+            return email_service.sendVerifyEmail(email, email_verification_token)
+        })
+        .then(() => { res.sendStatus(204) })
+        .catch(next);
 }
 
 const verify_email = (req, res, next) => {
@@ -41,10 +41,10 @@ const verify_email = (req, res, next) => {
             }
             user.email_verified = true;
             user.email_verification_token = null;
-            user.save()
-                .then(() => { res.sendStatus(204) })
-                .catch(next);
-        }).catch(next);
+            return user.save()
+        })
+        .then(() => { res.sendStatus(204) })
+        .catch(next);
 }
 
 export default {
