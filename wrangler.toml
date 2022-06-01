@@ -1,0 +1,5 @@
+name="bloxi-backend"
+workers_dev = true
+
+compatibility_date = "2022-02-03"
+

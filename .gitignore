@@ -1,5 +1,8 @@
-**/node_modules
-
-website
-
-**/.env
+dist
+node_modules
+worker
+package-lock.json
+yarn.lock
+.cargo-ok
+.env
+oldapi
