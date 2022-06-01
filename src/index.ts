@@ -1,38 +1,35 @@
 import { Hono } from 'hono'
 import { poweredBy } from 'hono/powered-by'
-import { basicAuth } from 'hono/basic-auth'
+import { logger } from 'hono/logger'
 
 export const app = new Hono()
 
 // Builtin middleware
 app.use('*', poweredBy())
-// Basic Auth
-app.use(
-  '/auth/*',
-  basicAuth({
-    username: 'hono',
-    password: 'acoolproject',
-  })
-)
+app.use('*', logger())
 
-// Custom middleware
+// Add X-Response-Time header
 app.use('*', async (c, next) => {
+  const start = Date.now()
   await next()
-  c.header('X-message', 'Hono is a cool project')
+  const ms = Date.now() - start
+  c.header('X-Response-Time', `${ms}ms`)
 })
 
-// Routing
-app.get('/', (c) => c.html('<h1>Hello Hono!</h1>'))
-app.get('/auth/*', (c) => c.text('You are authorized'))
-
-// Nested route
-const book = new Hono()
-// Named path parameters
-book.get('/:id', (c) => {
-  const id = c.req.param('id')
-  return c.json({ 'Your book ID is': id })
+// Custom Not Found Message
+app.notFound((c) => {
+  return c.text('Custom 404 Not Found', 404)
 })
-book.post('/', (c) => c.text('Book is created', 201))
-app.route('/book', book)
+
+// Error handling
+app.onError((err, c) => {
+  console.error(`${err}`)
+  return c.text('Custom Error Message', 500)
+})
+
+app.get('/', (c) => c.text('Hono!!'))
+
+app.get('/hello', () => new Response('This is /hello'))
+
 
 export default app
