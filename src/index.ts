@@ -40,8 +40,7 @@ app.onError((err: Error, c: Context) => {
 })
 
 app.get('/', (c) => {
-  return c.json({ message: 'Hello World' })
+  return c.json({ health: 'OK' })
 })
-
 
 export default app
