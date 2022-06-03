@@ -1,6 +1,34 @@
-name="bloxi-backend"
+name = "bloxi-backend"
+
+compatibility_date = "2020-06-03"
+
+[vars]
+ENVIRONMENT = "production"
+EMAIL_SENDER = "no-reply@bloxi.click"
+AWS_REGION = "eu-central-1"
+DISCORD_REDIRECT_URI = "https://bloxi.click/verify/discord"
+DISCORD_CLIENT_ID = "948546771422953482"
+FRONTEND_URL = "https://bloxi.click/"
+
+
+
+# Development
+[env.development]
+name = "bloxi-backend-dev"
 workers_dev = true
 
-compatibility_date = "2022-02-03"
+[env.development.vars]
+ENVIRONMENT = "development"
+DISCORD_CLIENT_ID = "948546771422953482"
+DISCORD_REDIRECT_URI = "http://localhost"
+FRONTEND_URL = "https://dev.bloxi.click/"
+AWS_REGION = "eu-central-1"
+EMAIL_SENDER = "dev-no-reply@bloxi.click"
 
 
+#[secrets]
+#JWT_SECRET 
+#DISCORD_CLIENT_SECRET
+#AWS_ACCESS_KEY_ID
+#AWS_SECRET_ACCESS_KEY
+#SENTRY_DSN
