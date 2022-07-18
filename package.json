@@ -9,7 +9,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "hono": "^1.4.3",
+    "dynamoose": "3.0.0-beta.5",
+    "hono": "^1.6.2",
     "toucan-js": "^2.6.0"
   },
   "devDependencies": {

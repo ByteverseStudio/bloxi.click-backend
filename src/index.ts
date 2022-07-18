@@ -30,13 +30,14 @@ app.notFound((c) => {
 app.onError((err: Error, c: Context) => {
   const sentry = new Toucan({
     dsn: c.env.SENTRY_DSN,
-    context: c.event,
+    event: c.event!,
     environment: c.env.ENVIRONMENT,
   })
   console.error(err)
   const eventId = sentry.captureException(err)
+  console.log(`Error reported to Sentry: ${eventId}`)
 
-  return c.json({ message: 'Internal Server Error', eventId }, 500, { "X-Sentry-ID": eventId })
+  return c.json({ message: 'Internal Server Error', eventId }, 500, { "X-Sentry-ID": eventId! })
 })
 
 app.get('/', (c) => {
