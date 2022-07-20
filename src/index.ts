@@ -5,6 +5,8 @@ import { prettyJSON } from 'hono/pretty-json'
 import { cors } from 'hono/cors'
 import Toucan from 'toucan-js';
 
+import {getLoggedInUser, login, register} from "./controller/user/user.api";
+
 const app = new Hono()
 
 // Builtin middleware
@@ -42,6 +44,18 @@ app.onError((err: Error, c: Context) => {
 
 app.get('/', (c) => {
   return c.json({ health: 'OK' })
-})
+});
+
+app.post('/user/register', (c) => {
+  return register(c);
+});
+
+app.post('/user/login', (c) => {
+  return login(c);
+});
+
+app.post('/user/me', (c) => {
+  return getLoggedInUser(c);
+});
 
 export default app

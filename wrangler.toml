@@ -1,7 +1,7 @@
 name = "bloxi-backend"
 workers_dev = false
 
-compatibility_date = "2020-06-03"
+compatibility_date = "2022-07-18"
 
 [vars]
 ENVIRONMENT = "production"
